@@ -72,6 +72,7 @@ class Plum_Island_Media_Telemetry_Run {
   private function add_hooks() {
 
     add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_backend_scripts_and_styles' ], 20 );
+    add_shortcode( 'renderjson', [ $this, 'jsonShortcode' ] );
   }
 
   /**
@@ -95,4 +96,56 @@ class Plum_Island_Media_Telemetry_Run {
     wp_enqueue_style( 'pimtelemetry-backend-styles', PIMTELEMETRY_PLUGIN_URL . 'core/includes/assets/css/backend-styles.css', [], PIMTELEMETRY_VERSION, 'all' );
   }
 
+  /**
+   * /**
+   * The [json] shortcode.
+   *
+   * Renders JSON between [json]<pre>    and </pre>[/json]
+   *
+   * @param array $atts Shortcode attributes. Default empty.
+   * @param string $content Shortcode content. Default null.
+   * @param string $tag Shortcode tag (name). Default empty.
+   *
+   * @return string Shortcode output.
+   */
+  public function jsonShortcode( $atts = [], $content = null, $tag = '' ) {
+
+    wp_enqueue_script( 'jquery' );
+    wp_enqueue_script( 'renderjson',
+      PIMTELEMETRY_PLUGIN_URL . 'core/includes/assets/js/renderjson.js',
+      [ 'jquery' ],
+      PIMTELEMETRY_VERSION,
+      false );
+
+    // place to render.
+    $o = '<div class="json render"><div id="json_render"></div></div>';
+
+    $o .= '
+      <script>
+      debugger
+        jQuery( document ).ready(function() {
+          let j = ';
+
+    $o .= "'";
+    $o .= $content;
+    $o .= "'" . PHP_EOL;
+    $o .= 'document.getElementById(\'json_render\')
+           .appendChild(
+              renderjson
+              .set_show_by_default(true)
+              .set_show_to_level(1)
+              .set_sort_objects(false)
+              .set_icons(\'►\', \'▼\')
+              .set_max_string_length(50)
+            ( JSON.parse(atob(j)) )
+         )
+   });
+      </script>';
+
+    // can't apply content filters here
+    //$o .= apply_filters( 'the_content', $content );
+
+// return output
+    return $o;
+  }
 }

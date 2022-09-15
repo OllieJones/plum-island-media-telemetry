@@ -47,14 +47,9 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
   function post( WP_REST_Request $req ): string {
     require_once ABSPATH . 'wp-admin/includes/admin.php';
     $upload           = $req->get_json_params();
-    $uploadCategoryId = term_exists( 'Upload' );
-    if ( ! $uploadCategoryId ) {
-      $uploadCategoryId = wp_insert_category( [
-        'cat_name'             => 'Upload',
-        'category_description' => 'Telemetry data uploaded from a WordPress site',
-        'category_nicename'    => 'telemetry_upload',
-      ] );
-    }
+    $uploadCategoryId = $this->maybeMakeCategory( 'Upload',
+      'Telemetry data uploaded from a WordPress site',
+      'telemetry_upload' );
 
     $tags = [];
     try {
@@ -86,12 +81,13 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
       $title [] = $upload['monitor'];
       $tags []  = 'Monitor';
     }
-    $content = '<pre>' . json_encode( (object) $upload, JSON_PRETTY_PRINT ) . '</pre>';
+    $payload = '[renderjson]' . base64_encode( json_encode( (object) $upload ) ) . '[/renderjson]';
     $post    = [
       'post_author'    => 1,
-      'post_content'   => $content,
+      'post_excerpt'   => implode( '|', $tags ),
+      'post_content'   => $payload,
       'post_title'     => implode( ' ', $title ),
-      'post_status'    => 'draft',
+      'post_status'    => 'publish',
       'post_category'  => [ $uploadCategoryId ],
       'comment_status' => 'open',
       'ping_status'    => 'closed',
@@ -108,6 +104,22 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
     }
 
     return current_user_can( 'read_private_posts' );
+  }
+
+  /**
+   * @return int|mixed|string|string[]|WP_Error|null
+   */
+  private function maybeMakeCategory( $category, $description, $nicename ) {
+    $uploadCategoryId = term_exists( $category );
+    if ( ! $uploadCategoryId ) {
+      $uploadCategoryId = wp_insert_category( [
+        'cat_name'             => $category,
+        'category_description' => $description,
+        'category_nicename'    => $nicename,
+      ] );
+    }
+
+    return $uploadCategoryId;
   }
 
 }
