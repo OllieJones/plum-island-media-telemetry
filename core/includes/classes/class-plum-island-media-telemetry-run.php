@@ -110,10 +110,13 @@ class Plum_Island_Media_Telemetry_Run {
    */
   public function jsonShortcode( $atts = [], $content = null, $tag = '' ) {
 
-    wp_enqueue_script( 'jquery' );
+    wp_enqueue_style('renderjson',
+      PIMTELEMETRY_PLUGIN_URL . 'core/includes/assets/css/renderjson.css',
+      [],
+      PIMTELEMETRY_VERSION);
     wp_enqueue_script( 'renderjson',
       PIMTELEMETRY_PLUGIN_URL . 'core/includes/assets/js/renderjson.js',
-      [ 'jquery' ],
+      [],
       PIMTELEMETRY_VERSION,
       false );
 
@@ -123,8 +126,8 @@ class Plum_Island_Media_Telemetry_Run {
     $o .= '
       <script>
       debugger
-        jQuery( document ).ready(function() {
-          let j = ';
+        window.addEventListener("DOMContentLoaded", ev => {
+          let uuJson = ';
 
     $o .= "'";
     $o .= $content;
@@ -132,12 +135,11 @@ class Plum_Island_Media_Telemetry_Run {
     $o .= 'document.getElementById(\'json_render\')
            .appendChild(
               renderjson
-              .set_show_by_default(true)
               .set_show_to_level(1)
               .set_sort_objects(false)
               .set_icons(\'►\', \'▼\')
               .set_max_string_length(50)
-            ( JSON.parse(atob(j)) )
+            ( JSON.parse(atob(uuJson)) )
          )
    });
       </script>';

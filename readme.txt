@@ -7,7 +7,7 @@ Tags: private
 Requires at least: 5.9
 Tested up to: 6.0.1
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,5 +39,5 @@ An answer to that question.
 = 1.0.0: August 27, 2022 =
 * Birthday of Plum Island Media Telemetry
 
-= 1.0.1: August 27, 2022 =
+= 1.0.2: Sept 16, 2022 =
 * Better rendering

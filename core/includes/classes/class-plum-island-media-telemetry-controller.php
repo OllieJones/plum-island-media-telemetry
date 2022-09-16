@@ -17,26 +17,12 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
 
       register_rest_route( "$this->namespace/v$this->version", "/$this->base", [
         [
-          'methods'             => 'GET',
-          'callback'            => [ $this, 'get' ],
-          'permission_callback' => [ $this, 'permission' ],
-        ],
-        [
           'callback'            => [ $this, 'post' ],
           'methods'             => 'POST',
           'permission_callback' => [ $this, 'permission' ],
         ],
       ] );
     } );
-  }
-
-  /**
-   * @param WP_REST_Request $req
-   *
-   * @return string
-   */
-  function get( WP_REST_Request $req ): string {
-    return json_encode( (object) [] );
   }
 
   /**
