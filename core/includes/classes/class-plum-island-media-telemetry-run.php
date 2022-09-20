@@ -71,31 +71,24 @@ class Plum_Island_Media_Telemetry_Run {
    */
   private function add_hooks() {
 
-    add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_backend_scripts_and_styles' ], 20 );
     add_shortcode( 'renderjson', [ $this, 'jsonShortcode' ] );
+
+    add_filter( 'generate_post_date_output', [$this, 'post_date_and_time'],15,2);
   }
 
-  /**
-   * ######################
-   * ###
-   * #### WORDPRESS HOOK CALLBACKS
-   * ###
-   * ######################
+  /** Generate
+   *
+   * @param string $date the already-generated date (ignored)
+   *
+   * @return string the date string we generate. It must end with a space for correct formatting.
    */
+  public function post_date_and_time( string $date): string {
 
-  /**
-   * Enqueue the backend related scripts and styles for this plugin.
-   * All of the added scripts andstyles will be available on every page within the backend.
-   *
-   * @access  public
-   * @return  void
-   * @since  1.0.0
-   *
-   */
-  public function enqueue_backend_scripts_and_styles() {
-    wp_enqueue_style( 'pimtelemetry-backend-styles', PIMTELEMETRY_PLUGIN_URL . 'core/includes/assets/css/backend-styles.css', [], PIMTELEMETRY_VERSION, 'all' );
+    $isodate = esc_attr(get_the_date('c'));
+    $textdate = esc_html(get_the_date() . ' ' . get_the_time());
+    $fmt = '<span class="posted-on"><time class="entry-date published" datetime="%1$s" itemprop="datePublished">%2$s</time></span> ';
+    return sprintf ($fmt, $isodate, $textdate);
   }
-
   /**
    * /**
    * The [json] shortcode.
@@ -110,10 +103,10 @@ class Plum_Island_Media_Telemetry_Run {
    */
   public function jsonShortcode( $atts = [], $content = null, $tag = '' ) {
 
-    wp_enqueue_style('renderjson',
+    wp_enqueue_style( 'renderjson',
       PIMTELEMETRY_PLUGIN_URL . 'core/includes/assets/css/renderjson.css',
       [],
-      PIMTELEMETRY_VERSION);
+      PIMTELEMETRY_VERSION );
     wp_enqueue_script( 'renderjson',
       PIMTELEMETRY_PLUGIN_URL . 'core/includes/assets/js/renderjson.js',
       [],

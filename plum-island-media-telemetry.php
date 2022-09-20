@@ -5,13 +5,13 @@
  * @package       PIMTELEMETRY
  * @author        Ollie Jones
  * @license       gplv2
- * @version       1.0.2
+ * @version       1.0.3
  *
  * @wordpress-plugin
  * Plugin Name:   Plum Island Media Telemetry
  * Plugin URI:    https://github.com/OllieJones/plum-island-media-telemetry
  * Description:   Accepts telemetry requests from other plugins
- * Version:       1.0.2
+ * Version:       1.0.3
  * Author:        Ollie Jones
  * Author URI:    https://github.com/OllieJones
  * Text Domain:   plum-island-media-telemetry
@@ -24,42 +24,44 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+  exit;
+}
 
 /**
  * HELPER COMMENT START
- * 
+ *
  * This file contains the main information about the plugin.
  * It is used to register all components necessary to run the plugin.
- * 
- * The comment above contains all information about the plugin 
+ *
+ * The comment above contains all information about the plugin
  * that are used by WordPress to differenciate the plugin and register it properly.
  * It also contains further PHPDocs parameter for a better documentation
- * 
- * The function PIMTELEMETRY() is the main function that you will be able to 
+ *
+ * The function PIMTELEMETRY() is the main function that you will be able to
  * use throughout your plugin to extend the logic. Further information
- * about that is available within the sub classes.
- * 
+ * about that is available within the subclasses.
+ *
  * HELPER COMMENT END
  */
 
 // Plugin name
-define( 'PIMTELEMETRY_NAME',			'Plum Island Media Telemetry' );
+const PIMTELEMETRY_NAME = 'Plum Island Media Telemetry';
 
 // Plugin version
-define( 'PIMTELEMETRY_VERSION',		'1.0.2' );
+const PIMTELEMETRY_VERSION = '1.0.3';
 
 // Plugin Root File
-define( 'PIMTELEMETRY_PLUGIN_FILE',	__FILE__ );
+const PIMTELEMETRY_PLUGIN_FILE = __FILE__;
 
 // Plugin base
-define( 'PIMTELEMETRY_PLUGIN_BASE',	plugin_basename( PIMTELEMETRY_PLUGIN_FILE ) );
+define( 'PIMTELEMETRY_PLUGIN_BASE', plugin_basename( PIMTELEMETRY_PLUGIN_FILE ) );
 
 // Plugin Folder Path
-define( 'PIMTELEMETRY_PLUGIN_DIR',	plugin_dir_path( PIMTELEMETRY_PLUGIN_FILE ) );
+define( 'PIMTELEMETRY_PLUGIN_DIR', plugin_dir_path( PIMTELEMETRY_PLUGIN_FILE ) );
 
 // Plugin Folder URL
-define( 'PIMTELEMETRY_PLUGIN_URL',	plugin_dir_url( PIMTELEMETRY_PLUGIN_FILE ) );
+define( 'PIMTELEMETRY_PLUGIN_URL', plugin_dir_url( PIMTELEMETRY_PLUGIN_FILE ) );
 
 /**
  * Load the main class for the core functionality
@@ -70,12 +72,12 @@ require_once PIMTELEMETRY_PLUGIN_DIR . 'core/class-plum-island-media-telemetry.p
  * The main function to load the only instance
  * of our master class.
  *
- * @author  Ollie Jones
- * @since   1.0.0
  * @return  object|Plum_Island_Media_Telemetry
+ * @since   1.0.0
+ * @author  Ollie Jones
  */
 function PIMTELEMETRY() {
-	return Plum_Island_Media_Telemetry::instance();
+  return Plum_Island_Media_Telemetry::instance();
 }
 
 PIMTELEMETRY();

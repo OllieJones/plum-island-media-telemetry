@@ -5,9 +5,9 @@ Donate link:
 Contributors:  Ollie Jones
 Tags: private
 Requires at least: 5.9
-Tested up to: 6.0.1
+Tested up to: 6.0.2
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,8 @@ Accepts telemetry requests from other plugins
 Accepts Telemetry and sticks it into custom posts.
 
 POST JSON objects to `https://whatever.plumislandmedia.net/wp-json/plumislandmedia/v1/upload`
+
+It stores the JSON in the post in base64 format in a [renderjson] shortcode. When displayed, it shows the JSON in a progressive-disclosure format.
 
 == Frequently Asked Questions ==
 
@@ -41,3 +43,10 @@ An answer to that question.
 
 = 1.0.2: Sept 16, 2022 =
 * Better rendering
+
+= 1.0.3: Sept 20, 2022 =
+* Show dates and times in post headers.
+
+== Credit ==
+
+* David Caldwell <david@porkrind.org> for renderjson.js
