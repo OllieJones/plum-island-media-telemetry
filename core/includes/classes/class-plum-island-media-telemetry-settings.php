@@ -1,4 +1,5 @@
 <?php
+namespace PIMTELEMETRY;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;

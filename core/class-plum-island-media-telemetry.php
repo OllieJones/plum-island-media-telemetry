@@ -1,6 +1,13 @@
 <?php
 
+namespace PIMTELEMETRY;
+
 // Exit if accessed directly.
+use PIMTELEMETRY\Plum_Island_Media_Telemetry_Controller;
+use PIMTELEMETRY\Plum_Island_Media_Telemetry_Helpers;
+use PIMTELEMETRY\Plum_Island_Media_Telemetry_Run;
+use PIMTELEMETRY\Plum_Island_Media_Telemetry_Settings;
+
 if ( ! defined( 'ABSPATH' ) ) {
   exit;
 }
@@ -20,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * HELPER COMMENT END
  */
 
-if ( ! class_exists( 'Plum_Island_Media_Telemetry' ) ) :
+if ( ! class_exists( 'PIMTELEMETRY\Plum_Island_Media_Telemetry' ) ) :
 
   /**
    * Main Plum_Island_Media_Telemetry Class.
@@ -46,7 +53,7 @@ if ( ! class_exists( 'Plum_Island_Media_Telemetry' ) ) :
      *
      * @access  public
      * @since  1.0.0
-     * @var    object|Plum_Island_Media_Telemetry_Helpers
+     * @var    Plum_Island_Media_Telemetry_Helpers
      */
     public $helpers;
 

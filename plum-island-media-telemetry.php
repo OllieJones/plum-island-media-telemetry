@@ -1,17 +1,21 @@
 <?php
+
+namespace PIMTELEMETRY;
+use PIMTELEMETRY\Plum_Island_Media_Telemetry;
+
 /**
  * Plum Island Media Telemetry
  *
  * @package       PIMTELEMETRY
  * @author        Ollie Jones
  * @license       gplv2
- * @version       1.0.3
+ * @version       1.1.0
  *
  * @wordpress-plugin
  * Plugin Name:   Plum Island Media Telemetry
  * Plugin URI:    https://github.com/OllieJones/plum-island-media-telemetry
  * Description:   Accepts telemetry requests from other plugins
- * Version:       1.0.3
+ * Version:       1.1.0
  * Author:        Ollie Jones
  * Author URI:    https://github.com/OllieJones
  * Text Domain:   plum-island-media-telemetry
@@ -49,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 const PIMTELEMETRY_NAME = 'Plum Island Media Telemetry';
 
 // Plugin version
-const PIMTELEMETRY_VERSION = '1.0.3';
+const PIMTELEMETRY_VERSION = '1.1.0';
 
 // Plugin Root File
 const PIMTELEMETRY_PLUGIN_FILE = __FILE__;

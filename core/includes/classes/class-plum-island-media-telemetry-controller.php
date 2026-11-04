@@ -1,5 +1,13 @@
 <?php
+namespace PIMTELEMETRY;
+use Exception;
+use WP_Error;
+use WP_REST_Controller;
+use WP_REST_Request;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
   private int $version;
   private string $base;
@@ -13,16 +21,41 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
 
   private function add_hooks() {
 
-    add_action( 'rest_api_init', function () {
+	  add_action( 'rest_api_init', function () {
 
-      register_rest_route( "$this->namespace/v$this->version", "/$this->base", [
-        [
-          'callback'            => [ $this, 'post' ],
-          'methods'             => 'POST',
-          'permission_callback' => [ $this, 'permission' ],
-        ],
-      ] );
-    } );
+		  register_rest_route( "$this->namespace/v$this->version", "/$this->base", [
+			  [
+				  'callback'            => [ $this, 'post' ],
+				  'methods'             => 'POST',
+				  'permission_callback' => [ $this, 'permission' ],
+			  ],
+		  ] );
+	  } );
+
+
+	  add_filter( 'rest_pre_dispatch', function ( $result, $server, $request ) {
+		  $route = $request->get_route();
+		  $ip    = $this->get_origin_ip_address();
+		  $sensitive_routes = array(
+			  '/' . $this->namespace . '/',
+		  );
+
+		  foreach ( $sensitive_routes as $sensitive_route ) {
+			  if ( str_starts_with( $route, $sensitive_route ) ) {
+				  if ( ! $this->rate_limit_check( $ip ) ) {
+					  error_log( PIMTELEMETRY_NAME . ' request refused (429) due to rate limited IP ' . $ip );
+
+					  return new WP_Error(
+						  'rate_limit_exceeded',
+						  'Too many requests. Please try again later.',
+						  array( 'status' => 429 )
+					  );
+				  }
+			  }
+		  }
+
+		  return $result;
+	  }, 10, 3 );
   }
 
   /**
@@ -67,6 +100,7 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
       $title [] = $upload['monitor'];
       $tags []  = 'Monitor';
     }
+	$title[] = '[' . $this->get_origin_ip_address() . ']';
     $payload = '[renderjson]' . base64_encode( json_encode( (object) $upload ) ) . '[/renderjson]';
     $post    = [
       'post_author'    => 1,
@@ -107,5 +141,52 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
 
     return $uploadCategoryId;
   }
+
+	/** Check for hitting a rate limit.
+	 *
+	 * We rely on transient expiration to make this work.
+	 *
+	 * @param string $ip_address The origin IP address.
+	 * @param integer $limit The number of operations allowed in ...
+	 * @param integer $period ...this number of seconds.
+	 *
+	 * @return bool False if the request hit the limit.
+	 */
+	private function rate_limit_check( string $ip_address, int $limit = 60, int $period = 3600 ): bool {
+		$transient_key = $this->namespace . '_' .  $this->base . '_' . 'rate_limit_' . md5( $ip_address );
+		$requests = get_transient( $transient_key );
+
+		if ( false === $requests ) {
+			set_transient( $transient_key, 1, $period );
+			return true;
+		}
+
+		if ( $requests >= $limit ) {
+			return false;
+		}
+
+		set_transient( $transient_key, $requests + 1, $period );
+		return true;
+	}
+
+	/**
+	 * Retrieve the origin IP address of the request, possibly behind some proxy.
+	 *
+	 * @return string
+	 */
+	private function get_origin_ip_address () {
+		foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key){
+			if (array_key_exists($key, $_SERVER) === true){
+				foreach (explode(',', $_SERVER[$key]) as $ip){
+					$ip = trim($ip);
+
+					if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false){
+						return $ip;
+					}
+				}
+			}
+		}
+		return '';
+	}
 
 }

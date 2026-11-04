@@ -5,9 +5,9 @@ Donate link:
 Contributors:  Ollie Jones
 Tags: private
 Requires at least: 5.9
-Tested up to: 6.0.2
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.3
+Stable tag: 1.1.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,6 +20,8 @@ Accepts Telemetry and sticks it into custom posts.
 POST JSON objects to `https://whatever.plumislandmedia.net/wp-json/plumislandmedia/v1/upload`
 
 It stores the JSON in the post in base64 format in a [renderjson] shortcode. When displayed, it shows the JSON in a progressive-disclosure format.
+
+It rate-limits by origin IP address.
 
 == Frequently Asked Questions ==
 
