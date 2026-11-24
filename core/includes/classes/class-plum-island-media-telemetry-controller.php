@@ -58,12 +58,12 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
 	  }, 10, 3 );
   }
 
-  /**
-   * @param WP_REST_Request $req
-   *
-   * @return string
-   */
-  function post( WP_REST_Request $req ): string {
+	/**
+	 * @param WP_REST_Request $req
+	 *
+	 * @return string|WP_error
+	 */
+  function post( WP_REST_Request $req ): string|WP_Error {
     require_once ABSPATH . 'wp-admin/includes/admin.php';
     $upload           = $req->get_json_params();
     $uploadCategoryId = $this->maybeMakeCategory( 'Upload',
@@ -72,25 +72,33 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
 
     $tags = [];
     try {
-      if ( is_array( $upload ) && array_key_exists( 'mysqlVer', $upload ) ) {
-        $ver     = (object) $upload['mysqlVer'];
-        $tags [] = $ver->unconstrained ? 'Barracuda' : 'Antelope';
-        $tags [] = $ver->fork;
-        $tags [] = "$ver->fork$ver->major.$ver->minor.$ver->build";
-      }
-      if ( is_array( $upload ) && array_key_exists( 'wordpress', $upload ) ) {
-        $ver     = (object) $upload['wordpress'];
-        $plugins = explode( '|', $ver->active_plugins );
-        foreach ( $plugins as $plugin ) {
-          $tags [] = 'P:' . $plugin;
-        }
-        $tags [] = 'WordPress ' . $ver->wp_version;
-        if ( $ver->is_multisite ) {
-          $tags[] = 'Multisite:' . $ver->current_blog_id;
-        }
-      }
+	    if ( ! is_array( $upload )
+	         || ! array_key_exists( 'id', $upload )
+	         || ! is_string( $upload['id]'] )
+	         || strlen( $upload['id'] ) <= 4
+	         || strlen( $upload['id'] ) > 31
+	         || 1 === preg_match( '/[^-_a-zA-Z0-9]/', $upload['id'] ) ) {
+		    return new WP_Error( 'malformed', 'Malformed data', array( 'status' => 400 ) );
+	    }
+	    if ( array_key_exists( 'mysqlVer', $upload ) ) {
+		    $ver     = (object) $upload['mysqlVer'];
+		    $tags [] = $ver->unconstrained ? 'Barracuda' : 'Antelope';
+		    $tags [] = $ver->fork;
+		    $tags [] = "$ver->fork$ver->major.$ver->minor.$ver->build";
+	    }
+	    if ( array_key_exists( 'wordpress', $upload ) ) {
+		    $ver     = (object) $upload['wordpress'];
+		    $plugins = explode( '|', $ver->active_plugins );
+		    foreach ( $plugins as $plugin ) {
+			    $tags [] = 'P:' . $plugin;
+		    }
+		    $tags [] = 'WordPress ' . $ver->wp_version;
+		    if ( $ver->is_multisite ) {
+			    $tags[] = 'Multisite:' . $ver->current_blog_id;
+		    }
+	    }
     } catch ( Exception $e ) {
-      /* empty, intentionally, don't croak if data is bogus */
+	    return new WP_Error( 'malformed', 'Malformed data', array( 'status' => 400 ) );
     }
 
     $title    = [];
@@ -107,7 +115,7 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
       'post_excerpt'   => implode( '|', $tags ),
       'post_content'   => $payload,
       'post_title'     => implode( ' ', $title ),
-      'post_status'    => 'publish',
+      'post_status'    => 'private',
       'post_category'  => [ $uploadCategoryId ],
       'comment_status' => 'open',
       'ping_status'    => 'closed',
@@ -152,7 +160,7 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
 	 *
 	 * @return bool False if the request hit the limit.
 	 */
-	private function rate_limit_check( string $ip_address, int $limit = 60, int $period = 3600 ): bool {
+	private function rate_limit_check( string $ip_address, int $limit = 3, int $period = 3600 ): bool {
 		$transient_key = $this->namespace . '_' .  $this->base . '_' . 'rate_limit_' . md5( $ip_address );
 		$requests = get_transient( $transient_key );
 

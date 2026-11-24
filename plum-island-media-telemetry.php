@@ -9,13 +9,13 @@ use PIMTELEMETRY\Plum_Island_Media_Telemetry;
  * @package       PIMTELEMETRY
  * @author        Ollie Jones
  * @license       gplv2
- * @version       1.1.0
+ * @version       1.1.1
  *
  * @wordpress-plugin
  * Plugin Name:   Plum Island Media Telemetry
  * Plugin URI:    https://github.com/OllieJones/plum-island-media-telemetry
  * Description:   Accepts telemetry requests from other plugins
- * Version:       1.1.0
+ * Version:       1.1.1
  * Author:        Ollie Jones
  * Author URI:    https://github.com/OllieJones
  * Text Domain:   plum-island-media-telemetry
