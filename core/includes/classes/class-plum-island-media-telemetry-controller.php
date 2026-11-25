@@ -74,10 +74,11 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
     try {
 	    if ( ! is_array( $upload )
 	         || ! array_key_exists( 'id', $upload )
-	         || ! is_string( $upload['id]'] )
+	         || ! is_string( $upload['id'] )
 	         || strlen( $upload['id'] ) <= 4
 	         || strlen( $upload['id'] ) > 31
 	         || 1 === preg_match( '/[^-_a-zA-Z0-9]/', $upload['id'] ) ) {
+		    error_log( PIMTELEMETRY_NAME . ' request refused (400) due to bogus upload id ' . $upload['id'] . ' from IP ' . $this->get_origin_ip_address() );
 		    return new WP_Error( 'malformed', 'Malformed data', array( 'status' => 400 ) );
 	    }
 	    if ( array_key_exists( 'mysqlVer', $upload ) ) {
@@ -160,7 +161,7 @@ class Plum_Island_Media_Telemetry_Controller extends WP_REST_Controller {
 	 *
 	 * @return bool False if the request hit the limit.
 	 */
-	private function rate_limit_check( string $ip_address, int $limit = 3, int $period = 3600 ): bool {
+	private function rate_limit_check( string $ip_address, int $limit = 10, int $period = 3600 ): bool {
 		$transient_key = $this->namespace . '_' .  $this->base . '_' . 'rate_limit_' . md5( $ip_address );
 		$requests = get_transient( $transient_key );
 
